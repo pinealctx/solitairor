@@ -1,0 +1,2 @@
+# solitairor
+Solver of solvitaire
