@@ -94,10 +94,7 @@ func (p *Puzzle) push(childStates ...*StateM) int {
 		var exist, ok = p.visitRec[key]
 		if ok {
 			// the node be visited
-			if exist.ReverseStep == 0 {
-				// the node has no result, actually, it's a loop road but no way to solve.
-				exist.ReverseStep = InfiniteStep
-			} else if exist.ReverseStep > 0 {
+			if exist.ReverseStep > 0 {
 				// the node has a way, skip to search, record it.
 				p.roads = append(p.roads, Road{
 					ForwardStep: child.ForwardStep,

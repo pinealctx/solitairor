@@ -9,6 +9,16 @@ type Pile struct {
 	Cards []Card
 }
 
+func PileFromCard(cards ...Card) Pile {
+	return PileFromCards(cards)
+}
+
+func PileFromCards(cards []Card) Pile {
+	var p = Pile{}
+	p.AddCards(cards)
+	return p
+}
+
 func NewPile(cards ...Card) *Pile {
 	return NewPileFromCards(cards)
 }

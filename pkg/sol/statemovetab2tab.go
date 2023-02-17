@@ -7,6 +7,10 @@ func (s *StateM) moveTab2OtherTab(src, target int) (*StateM, bool) {
 		if i == -1 {
 			return nil, false
 		}
+		if i == 0 {
+			// move a pure pile(king is first) to another is none-sense.
+			return nil, false
+		}
 		var ns = s.Derive()
 		ns.PileTable[src].MoveTail2Other(&ns.PileTable[target], i)
 		return ns, true

@@ -122,5 +122,6 @@ func (s *StateM) ReverseBroadcast() {
 			break
 		}
 		pp.ReverseStep = p.ReverseStep + 1
+		p = pp
 	}
 }

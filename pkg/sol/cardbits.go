@@ -32,3 +32,7 @@ func (x *CardBits) RemoveCard(cards ...Card) *CardBits {
 	}
 	return x
 }
+
+func (x *CardBits) Empty() bool {
+	return *x == 0
+}

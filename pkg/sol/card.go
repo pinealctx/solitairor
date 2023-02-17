@@ -8,8 +8,10 @@ const (
 )
 
 const (
-	AceRank       = 1
-	KingRank Rank = 13
+	AceRank        = 1
+	KingRank  Rank = 13
+	QueenRank      = 12
+	JackRank       = 11
 )
 
 var (
