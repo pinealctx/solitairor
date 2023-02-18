@@ -17,3 +17,11 @@ func TestPuzzle_Run2(t *testing.T) {
 	t.Log(p.Road())
 	t.Log(p.searchCount)
 }
+
+func TestPuzzle_RunRand(t *testing.T) {
+	var p = NewPuzzle(100000, 100000)
+	p.InitRoot(NewQRandState())
+	p.Run()
+	t.Log(p.Road())
+	t.Log(p.searchCount)
+}

@@ -93,6 +93,13 @@ func TestStateM_Key(t *testing.T) {
 	t.Log(n1.Key() == n2.Key())
 }
 
+func TestNewQRandState(t *testing.T) {
+	var s = NewQRandState()
+	for i := 0; i < PileCount; i++ {
+		t.Log(s.PileTable[i].Cards)
+	}
+}
+
 /*
 Deck             Spades    Hearts    Clubs   Diamonds
 []                [Q]       [Q]       [Q]      [Q]

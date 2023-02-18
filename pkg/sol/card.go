@@ -14,16 +14,20 @@ const (
 	JackRank       = 11
 )
 
-var (
-	SpadesCards   [13]Card
-	HeartsCards   [13]Card
-	ClubsCards    [13]Card
-	DiamondsCards [13]Card
+const (
+	CardCountOfColor = 13
+)
 
-	SpadesDownCards   [13]Card
-	HeartsDownCards   [13]Card
-	ClubsDownCards    [13]Card
-	DiamondsDownCards [13]Card
+var (
+	SpadesCards   [CardCountOfColor]Card
+	HeartsCards   [CardCountOfColor]Card
+	ClubsCards    [CardCountOfColor]Card
+	DiamondsCards [CardCountOfColor]Card
+
+	SpadesDownCards   [CardCountOfColor]Card
+	HeartsDownCards   [CardCountOfColor]Card
+	ClubsDownCards    [CardCountOfColor]Card
+	DiamondsDownCards [CardCountOfColor]Card
 
 	SpadesKing   = CardC(Spades, KingRank)
 	HeartsKing   = CardC(Hearts, KingRank)
@@ -67,15 +71,15 @@ type Rank byte
 
 func (x Rank) String() string {
 	switch x {
-	case 1:
+	case AceRank:
 		return "A"
 	case 10:
 		return "10"
-	case 11:
+	case JackRank:
 		return "J"
-	case 12:
+	case QueenRank:
 		return "Q"
-	case 13:
+	case KingRank:
 		return "K"
 	}
 	return string('0' + x)
@@ -105,7 +109,7 @@ func (x Card) IsRed() bool {
 
 func (x Card) Seq() int {
 	var suit = x.Suit()
-	return int(suit)*13 + int(x.Rank()) - 1
+	return int(suit)*CardCountOfColor + int(x.Rank()) - 1
 }
 
 func (x Card) Null() bool {
@@ -169,8 +173,33 @@ func CardCD(s Suit, r Rank) Card {
 	return Card(s)<<4 | Card(r) | 0b01000000
 }
 
+func GenCards() Cards {
+	var cards = make([]Card, CardCountOfColor*4)
+	for i := 0; i < CardCountOfColor; i++ {
+		cards[i] = SpadesCards[i]
+		cards[i+CardCountOfColor] = HeartsCards[i]
+		cards[i+CardCountOfColor*2] = ClubsCards[i]
+		cards[i+CardCountOfColor*3] = DiamondsCards[i]
+	}
+	return cards
+}
+
+type Cards []Card
+
+func (x Cards) Len() int {
+	return len(x)
+}
+
+func (x Cards) Less(i, j int) bool {
+	return x[i].Seq() < x[j].Seq()
+}
+
+func (x Cards) Swap(i, j int) {
+	x[i], x[j] = x[j], x[i]
+}
+
 func init() {
-	for i := 0; i < 13; i++ {
+	for i := 0; i < CardCountOfColor; i++ {
 		SpadesCards[i] = CardC(Spades, Rank(i+1))
 		HeartsCards[i] = CardC(Hearts, Rank(i+1))
 		ClubsCards[i] = CardC(Clubs, Rank(i+1))

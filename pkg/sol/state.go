@@ -2,6 +2,13 @@ package sol
 
 const (
 	InfiniteStep = -1
+	DeckCount    = 24
+)
+
+var (
+	QShuffle   = NewShuffler(QRandBetween)
+	Shuffle    = NewShuffler(RandBetween)
+	SecShuffle = NewShuffler(SecRandBetween)
 )
 
 type StateKey struct {
@@ -42,6 +49,33 @@ type StateM struct {
 
 func NewState() *StateM {
 	return &StateM{}
+}
+
+func NewQRandState() *StateM {
+	var cards = GenCards()
+	QShuffle.Shuffle(cards)
+	return NewGameState(cards)
+}
+
+func NewGameState(cards []Card) *StateM {
+	var s = NewState()
+	for i := 0; i < DeckCount; i++ {
+		s.StockCardBits.AddCard(cards[i])
+	}
+	var cursor = DeckCount
+	for i := 0; i < PileCount; i++ {
+		for j := 0; j < i+1; j++ {
+			if j != i {
+				var c = cards[cursor]
+				c.SetFaceDown()
+				s.PileTable[i].AddCard(c)
+			} else {
+				s.PileTable[i].AddCard(cards[cursor])
+			}
+			cursor++
+		}
+	}
+	return s
 }
 
 func NewStateFrom(sf, hf, cf, df byte, stock CardBits, piles ...Pile) *StateM {
