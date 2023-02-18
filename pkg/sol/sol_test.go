@@ -7,6 +7,7 @@ func TestPuzzle_Run1(t *testing.T) {
 	p.InitRoot(genSimpleState1())
 	p.Run()
 	t.Log(p.Road())
+	t.Log(p.searchCount)
 }
 
 func TestPuzzle_Run2(t *testing.T) {
@@ -14,4 +15,5 @@ func TestPuzzle_Run2(t *testing.T) {
 	p.InitRoot(genSimpleState2())
 	p.Run()
 	t.Log(p.Road())
+	t.Log(p.searchCount)
 }

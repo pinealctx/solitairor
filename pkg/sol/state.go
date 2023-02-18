@@ -102,8 +102,13 @@ func (s *StateM) Key() StateKey {
 
 func (s *StateM) IsWin() bool {
 	for i := 0; i < PileCount; i++ {
-		if s.PileTable[i].Len() > 0 {
-			return false
+		var l = s.PileTable[i].Len()
+		if l > 0 {
+			for j := 0; j < l; j++ {
+				if s.PileTable[i].Cards[j].FaceDown() {
+					return false
+				}
+			}
 		}
 	}
 	return true

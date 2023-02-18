@@ -4,7 +4,7 @@ import "testing"
 
 func TestHandleMoveFromDeck1(t *testing.T) {
 	var s = genSimpleState1()
-	var ns = s.handleMoveFromDeck(nil)
+	var ns = s.handleMoveDeckToTab(nil)
 	for _, v := range ns {
 		t.Log(v)
 	}
@@ -28,7 +28,7 @@ func TestHandleMoveToOtherTab1(t *testing.T) {
 
 func TestHandleMoveFromDeck2(t *testing.T) {
 	var s = genSimpleState2()
-	var ns = s.handleMoveFromDeck(nil)
+	var ns = s.handleMoveDeckToTab(nil)
 	for _, v := range ns {
 		t.Log(v)
 	}

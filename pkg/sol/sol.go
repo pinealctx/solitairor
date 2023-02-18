@@ -87,6 +87,8 @@ func (p *Puzzle) push(childStates ...*StateM) int {
 				ReverseStep: 0,
 			})
 			child.ReverseBroadcast()
+			// no need to push into stack
+			continue
 		}
 
 		child.PileTable.Sort()
