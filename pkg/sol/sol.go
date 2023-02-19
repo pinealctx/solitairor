@@ -58,8 +58,20 @@ func (p *Puzzle) Run() {
 	}
 }
 
+func (p *Puzzle) SolutionCount() int {
+	return len(p.hit)
+}
+
 func (p *Puzzle) Record(r *Record) {
 	r.SolutionCount = len(p.hit)
+	r.MaxStackSize = p.maxStackSize
+	r.MaxSearchSize = p.maxSearchSize
+	r.SearchCount = p.searchCount
+	r.EndProcReason = int(p.endProcReason)
+
+	if r.SolutionCount == 0 {
+		return
+	}
 
 	var minStep = math.MaxInt
 	var maxStep = 0
@@ -93,11 +105,6 @@ func (p *Puzzle) Record(r *Record) {
 	r.DiffStep = sumDiff / sumCount
 	r.MinStep = minStep
 	r.MaxStep = maxStep
-
-	r.MaxStackSize = p.maxStackSize
-	r.MaxSearchSize = p.maxSearchSize
-	r.SearchCount = p.searchCount
-	r.EndProcReason = int(p.endProcReason)
 }
 
 func (p *Puzzle) push(childStates ...*StateM) EndProcReason {
