@@ -1,5 +1,7 @@
 package sol
 
+import "bytes"
+
 const (
 	Spades   Suit = 0
 	Hearts   Suit = 1
@@ -184,6 +186,12 @@ func GenCards() Cards {
 	return cards
 }
 
+func GenQRandCards() Cards {
+	var cards = GenCards()
+	QShuffle.Shuffle(cards)
+	return cards
+}
+
 type Cards []Card
 
 func (x Cards) Len() int {
@@ -196,6 +204,42 @@ func (x Cards) Less(i, j int) bool {
 
 func (x Cards) Swap(i, j int) {
 	x[i], x[j] = x[j], x[i]
+}
+
+func (x Cards) JTxt() string {
+	var l = len(x)
+	if l == 0 {
+		return "[]"
+	}
+	var buf = bytes.NewBuffer(make([]byte, 768))
+	buf.Reset()
+	buf.WriteByte('[')
+	for i := 0; i < l-1; i++ {
+		buf.WriteByte('"')
+		buf.WriteString(x[i].String())
+		buf.WriteByte('"')
+		buf.WriteByte(',')
+	}
+	buf.WriteByte('"')
+	buf.WriteString(x[l-1].String())
+	buf.WriteByte('"')
+	buf.WriteByte(']')
+	return buf.String()
+}
+
+func (x Cards) Txt() string {
+	var l = len(x)
+	if l == 0 {
+		return ""
+	}
+	var buf = bytes.NewBuffer(make([]byte, 512))
+	buf.Reset()
+	for i := 0; i < l-1; i++ {
+		buf.WriteString(x[i].String())
+		buf.WriteByte(',')
+	}
+	buf.WriteString(x[l-1].String())
+	return buf.String()
 }
 
 func init() {

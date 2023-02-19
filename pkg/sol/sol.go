@@ -1,15 +1,6 @@
 package sol
 
-const (
-	endProcByMaxStack  = -1 // end process by max stack size limit
-	endProcByMaxSearch = -2 // end process by max search size limit
-)
-
-// Road : solution road
-type Road struct {
-	ForwardStep int
-	ReverseStep int
-}
+import "math"
 
 type Puzzle struct {
 	stack    *Stack
@@ -24,10 +15,11 @@ type Puzzle struct {
 	searchCount int
 
 	// end proc reason (0-normal -1 -- max stack size -2 -- max search size)
-	endProcReason int
+	endProcReason EndProcReason
 
-	// record
-	roads []Road
+	// record hit
+	// key is the step, value is counter.
+	hit map[int]int
 }
 
 func NewPuzzle(maxStackSize int, maxSearchSize int) *Puzzle {
@@ -36,7 +28,7 @@ func NewPuzzle(maxStackSize int, maxSearchSize int) *Puzzle {
 		visitRec:      make(map[StateKey]*StateM),
 		maxStackSize:  maxStackSize,
 		maxSearchSize: maxSearchSize,
-		roads:         nil,
+		hit:           make(map[int]int),
 	}
 	return p
 }
@@ -50,42 +42,79 @@ func (p *Puzzle) Run() {
 		var state = p.stack.Pop()
 		var childStates = state.MoveNext()
 		var count = p.push(childStates...)
-		if count == endProcByMaxStack {
-			p.endProcReason = endProcByMaxStack
+		if count == EndProcByMaxStack {
+			p.endProcReason = EndProcByMaxStack
 			break
-		} else if count == endProcByMaxSearch {
-			p.endProcReason = endProcByMaxSearch
+		} else if count == EndProcByMaxSearch {
+			p.endProcReason = EndProcByMaxSearch
 			break
-		} else if count == 0 {
+		}
+		// Actually, no need to set node reverse step to infinite.
+		/* else if count == 0 {
 			// no child state, mark it
 			var exist = p.visitRec[state.Key()]
 			exist.ReverseStep = InfiniteStep
-		}
+		}*/
 	}
 }
 
-func (p *Puzzle) Road() []Road {
-	return p.roads
+func (p *Puzzle) Record(r *Record) {
+	r.SolutionCount = len(p.hit)
+
+	var minStep = math.MaxInt
+	var maxStep = 0
+	var sumStep = 0
+	var sumCount = 0
+	var sumDiff = 0
+	var averageStep = 0
+
+	for step, count := range p.hit {
+		if step < minStep {
+			minStep = step
+		}
+		if step > maxStep {
+			maxStep = step
+		}
+		sumStep += step * count
+		sumCount += count
+	}
+	if sumStep > 0 {
+		averageStep = sumStep / sumCount
+	}
+	for step, count := range p.hit {
+		var diff = step - averageStep
+		if diff < 0 {
+			diff = -diff
+		}
+		sumDiff += diff * count
+	}
+
+	r.AverageStep = averageStep
+	r.DiffStep = sumDiff / sumCount
+	r.MinStep = minStep
+	r.MaxStep = maxStep
+
+	r.MaxStackSize = p.maxStackSize
+	r.MaxSearchSize = p.maxSearchSize
+	r.SearchCount = p.searchCount
+	r.EndProcReason = int(p.endProcReason)
 }
 
-func (p *Puzzle) push(childStates ...*StateM) int {
+func (p *Puzzle) push(childStates ...*StateM) EndProcReason {
 	var size = len(childStates)
 	if size+p.stack.Size() >= p.maxStackSize {
-		return endProcByMaxStack
+		return EndProcByMaxStack
 	}
 	if size+p.searchCount >= p.maxSearchSize {
-		return endProcByMaxSearch
+		return EndProcByMaxSearch
 	}
 	p.searchCount += size
 
-	var count = 0
+	var count EndProcReason
 	for _, child := range childStates {
 		if child.IsWin() {
 			// already win, record it
-			p.roads = append(p.roads, Road{
-				ForwardStep: child.ForwardStep,
-				ReverseStep: 0,
-			})
+			p.hit[child.ForwardStep]++
 			child.ReverseBroadcast()
 			// no need to push into stack
 			continue
@@ -98,10 +127,7 @@ func (p *Puzzle) push(childStates ...*StateM) int {
 			// the node be visited
 			if exist.ReverseStep > 0 {
 				// the node has a way, skip to search, record it.
-				p.roads = append(p.roads, Road{
-					ForwardStep: child.ForwardStep,
-					ReverseStep: exist.ReverseStep,
-				})
+				p.hit[child.ForwardStep+exist.ReverseStep]++
 			}
 			// skip to push into stack
 			continue

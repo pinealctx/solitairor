@@ -1,8 +1,7 @@
 package sol
 
 const (
-	InfiniteStep = -1
-	DeckCount    = 24
+	DeckCount = 24
 )
 
 var (
@@ -52,8 +51,7 @@ func NewState() *StateM {
 }
 
 func NewQRandState() *StateM {
-	var cards = GenCards()
-	QShuffle.Shuffle(cards)
+	var cards = GenQRandCards()
 	return NewGameState(cards)
 }
 
@@ -150,10 +148,6 @@ func (s *StateM) IsWin() bool {
 
 func (s *StateM) ReverseBroadcast() {
 	var p = s
-	if s.ReverseStep == InfiniteStep {
-		return
-	}
-
 	// reverse broadcast
 	for {
 		var pp = p.Parent

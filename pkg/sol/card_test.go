@@ -176,3 +176,9 @@ func TestCardZero(t *testing.T) {
 	var card Card
 	t.Log(card.Suit(), card.Rank(), card.Seq(), card.FaceDown())
 }
+
+func TestCards_Txt(t *testing.T) {
+	var r = GenQRandCards()
+	t.Log(r.Txt())
+	t.Log(r.JTxt())
+}
