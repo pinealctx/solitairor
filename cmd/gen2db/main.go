@@ -7,6 +7,7 @@ import (
 	"gorm.io/gorm"
 	"log"
 	"os"
+	"time"
 )
 
 func main() {
@@ -76,7 +77,9 @@ func runCmd(c *cli.Context) error {
 		store.Schema(c.String("schema")),
 		store.DebugMode(c.Bool("debugDB")),
 	)
-	for i := 0; i < c.Int("runCount"); i++ {
+	var t1 = time.Now()
+	var runCount = c.Int("runCount")
+	for i := 0; i < runCount; i++ {
 		generateSolitaire(
 			c.Int("maxStackSize"),
 			c.Int("maxSearchSize"),
@@ -84,6 +87,9 @@ func runCmd(c *cli.Context) error {
 			c.String("tableName"),
 		)
 	}
+	var t2 = time.Now()
+	var dur = t2.Sub(t1)
+	log.Println("total time:", dur, "average time:", dur/time.Duration(runCount))
 	return nil
 }
 
