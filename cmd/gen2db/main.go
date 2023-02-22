@@ -7,7 +7,17 @@ import (
 	"gorm.io/gorm"
 	"log"
 	"os"
+	"sync"
 	"time"
+)
+
+var (
+	maxStackSize  int
+	maxSearchSize int
+	db            *gorm.DB
+	tableName     string
+	saveChan      = make(chan *sol.Record, 1024*8)
+	wg            = &sync.WaitGroup{}
 )
 
 func main() {
@@ -70,7 +80,7 @@ func main() {
 }
 
 func runCmd(c *cli.Context) error {
-	var db = store.NewDB(
+	db = store.NewDB(
 		store.User(c.String("user")),
 		store.Password(c.String("password")),
 		store.Host(c.String("host")),
@@ -78,22 +88,38 @@ func runCmd(c *cli.Context) error {
 		store.DebugMode(c.Bool("debugDB")),
 	)
 	var t1 = time.Now()
+	maxStackSize = c.Int("maxStackSize")
+	maxSearchSize = c.Int("maxSearchSize")
+	tableName = c.String("tableName")
 	var runCount = c.Int("runCount")
+	var validCount = 0
+
+	wg.Add(1)
+	// start go routine to receive records.
+	go receive2Save()
+
 	for i := 0; i < runCount; i++ {
-		generateSolitaire(
-			c.Int("maxStackSize"),
-			c.Int("maxSearchSize"),
-			db,
-			c.String("tableName"),
-		)
+		if generateSolitaire() {
+			validCount++
+		}
 	}
+
 	var t2 = time.Now()
 	var dur = t2.Sub(t1)
 	log.Println("total time:", dur, "average time:", dur/time.Duration(runCount))
+	log.Println(
+		"total count:", runCount, "valid count:", validCount, "pass:", float64(validCount)/float64(runCount))
+
+	// put nil to save chan to exit receive go routine.
+	saveChan <- nil
+
+	wg.Wait()
+	var t3 = time.Now()
+	log.Println("wait save time:", t3.Sub(t2))
 	return nil
 }
 
-func generateSolitaire(maxStackSize int, maxSearchSize int, db *gorm.DB, tableName string) {
+func generateSolitaire() bool {
 	var cards = sol.GenQRandCards()
 	var p = sol.NewPuzzle(maxStackSize, maxSearchSize)
 	p.InitRoot(sol.NewGameState(cards))
@@ -101,6 +127,19 @@ func generateSolitaire(maxStackSize int, maxSearchSize int, db *gorm.DB, tableNa
 	if p.SolutionCount() > 0 {
 		var r = &sol.Record{InitCards: cards.Txt()}
 		p.Record(r)
+		saveChan <- r
+		return true
+	}
+	return false
+}
+
+func receive2Save() {
+	defer wg.Done()
+	for {
+		var r = <-saveChan
+		if r == nil {
+			break
+		}
 		var err = store.InsertItem(db, tableName, r)
 		if err != nil {
 			log.Println("insert item error:", err)
