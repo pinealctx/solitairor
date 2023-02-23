@@ -1,2 +1,4 @@
 .idea
 cmd/gen2db/storeSolitaire
+cmd/parsecards/parsecards
+cmd/testify/testify

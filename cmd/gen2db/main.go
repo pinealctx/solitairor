@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/pinealctx/solitairor/pkg/sol"
 	"github.com/pinealctx/solitairor/pkg/store"
 	"github.com/urfave/cli/v2"
@@ -73,9 +74,9 @@ func main() {
 	}
 	var err = app.Run(os.Args)
 	if err != nil {
-		log.Println("run command error:", err)
+		fmt.Println("run command error:", err)
 	} else {
-		log.Println("run command ok")
+		fmt.Println("run command ok")
 	}
 }
 
@@ -94,6 +95,7 @@ func runCmd(c *cli.Context) error {
 	var runCount = c.Int("runCount")
 	var validCount = 0
 
+	fmt.Println("start generate solitaire to database")
 	wg.Add(1)
 	// start go routine to receive records.
 	go receive2Save()
@@ -102,12 +104,14 @@ func runCmd(c *cli.Context) error {
 		if generateSolitaire() {
 			validCount++
 		}
+		fmt.Print(".")
 	}
+	fmt.Println("")
 
 	var t2 = time.Now()
 	var dur = t2.Sub(t1)
-	log.Println("total time:", dur, "average time:", dur/time.Duration(runCount))
-	log.Println(
+	fmt.Println("total time:", dur, "average time:", dur/time.Duration(runCount))
+	fmt.Println(
 		"total count:", runCount, "valid count:", validCount, "pass:", float64(validCount)/float64(runCount))
 
 	// put nil to save chan to exit receive go routine.
@@ -115,7 +119,7 @@ func runCmd(c *cli.Context) error {
 
 	wg.Wait()
 	var t3 = time.Now()
-	log.Println("wait save time:", t3.Sub(t2))
+	fmt.Println("wait save time:", t3.Sub(t2))
 	return nil
 }
 

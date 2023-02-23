@@ -43,13 +43,13 @@ type Suit byte
 func (x Suit) String() string {
 	switch x {
 	case Spades:
-		return "♠️"
+		return SpadesStr
 	case Hearts:
-		return "♥️"
+		return HeartsStr
 	case Clubs:
-		return "♣️"
+		return ClubsStr
 	case Diamonds:
-		return "♦️"
+		return DiamondsStr
 	}
 	return "?"
 }
@@ -204,6 +204,18 @@ func (x Cards) Less(i, j int) bool {
 
 func (x Cards) Swap(i, j int) {
 	x[i], x[j] = x[j], x[i]
+}
+
+func (x Cards) ToBytes() []byte {
+	var size = len(x)
+	if size == 0 {
+		return nil
+	}
+	var buf = make([]byte, size)
+	for i := 0; i < size; i++ {
+		buf[i] = byte(x[i])
+	}
+	return buf
 }
 
 func (x Cards) JTxt() string {
