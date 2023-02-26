@@ -50,9 +50,10 @@ func main() {
 				Usage: "table name",
 				Value: "solitaire_1m",
 			},
-			&cli.BoolFlag{
-				Name:  "debugDB",
-				Usage: "log database sql",
+			&cli.StringFlag{
+				Name:  "dbLogLevel",
+				Usage: "log database level",
+				Value: "warn",
 			},
 			&cli.IntFlag{
 				Name:  "maxStackSize",
@@ -86,7 +87,7 @@ func runCmd(c *cli.Context) error {
 		store.Password(c.String("password")),
 		store.Host(c.String("host")),
 		store.Schema(c.String("schema")),
-		store.DebugMode(c.Bool("debugDB")),
+		store.LogLevel(c.String("dbLogLevel")),
 	)
 	var t1 = time.Now()
 	maxStackSize = c.Int("maxStackSize")
@@ -126,7 +127,7 @@ func runCmd(c *cli.Context) error {
 func generateSolitaire() bool {
 	var cards = sol.GenQRandCards()
 	var p = sol.NewPuzzle(maxStackSize, maxSearchSize)
-	p.InitRoot(sol.NewGameState(cards))
+	p.InitRoot(sol.NewGameStateFromCards(cards))
 	p.Run()
 	if p.SolutionCount() > 0 {
 		var r = &sol.Record{InitCards: cards.Txt()}

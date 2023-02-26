@@ -1,6 +1,8 @@
 package sol
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestCard_SpadesCards_String(t *testing.T) {
 	for i := 0; i < CardCountOfColor; i++ {

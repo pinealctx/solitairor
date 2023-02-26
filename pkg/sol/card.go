@@ -254,6 +254,27 @@ func (x Cards) Txt() string {
 	return buf.String()
 }
 
+func MakeCardsFromBytes(buf []byte) Cards {
+	var size = len(buf)
+	if size == 0 {
+		return nil
+	}
+	var cards = make([]Card, size)
+	for i := 0; i < size; i++ {
+		cards[i] = Card(buf[i])
+	}
+	return cards
+}
+
+type CardRecord struct {
+	Step  int    `json:"step"`
+	Min   int    `json:"min"`
+	Max   int    `json:"max"`
+	Diff  int    `json:"diff"`
+	Road  int    `json:"road"`
+	Cards []byte `json:"cards"`
+}
+
 func init() {
 	for i := 0; i < CardCountOfColor; i++ {
 		SpadesCards[i] = CardC(Spades, Rank(i+1))

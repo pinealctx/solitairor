@@ -8,6 +8,21 @@ func (s *StateM) moveDeckToTab(i int) []*StateM {
 	return s.moveDeckCardsToTab(i, s.PileTable[i].Tail().FollowCards()...)
 }
 
+func (s *StateM) moveDeckToEmptyTab(i int) []*StateM {
+	if s.PileTable[i].Empty() {
+		// only king can move
+		return s.moveDeckCardsToTab(i, SpadesKing, HeartsKing, ClubsKing, DiamondsKing)
+	}
+	return nil
+}
+
+func (s *StateM) moveDeckToNoEmptyTab(i int) []*StateM {
+	if s.PileTable[i].Empty() {
+		return nil
+	}
+	return s.moveDeckCardsToTab(i, s.PileTable[i].Tail().FollowCards()...)
+}
+
 func (s *StateM) moveDeckCardsToTab(i int, cards ...Card) []*StateM {
 	var ret []*StateM
 	for j := range cards {

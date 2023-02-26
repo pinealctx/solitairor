@@ -48,8 +48,8 @@ func ParseCard(ss string) (Card, error) {
 	return CardC(suit, rank), nil
 }
 
-func Convert2ClientCards(cards Cards) Cards {
-	var stateM = NewGameState(cards)
+func ConvertLegacyCards(cards Cards) Cards {
+	var stateM = NewGameStateFromLegacyCards(cards)
 	var size = len(cards)
 	var clientCards = make([]Card, size)
 

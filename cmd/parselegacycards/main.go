@@ -36,7 +36,7 @@ func parseCardsAction(c *cli.Context) error {
 	}
 	fmt.Println("output cards:", ccs)
 	fmt.Println("output cards:", ccs.ToBytes())
-	var cls = sol.Convert2ClientCards(ccs)
+	var cls = sol.ConvertLegacyCards(ccs)
 	fmt.Println("client cards:", cls)
 	fmt.Println("client cards:", cls.ToBytes())
 	return nil

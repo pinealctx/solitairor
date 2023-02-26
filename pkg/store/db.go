@@ -6,6 +6,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 	"strings"
 	"time"
 )
@@ -21,7 +22,7 @@ type Dsn struct {
 	MaxOpenConn int
 	MaxIdle     int
 	MaxLifeTime time.Duration
-	DebugMode   bool
+	LogLevel    logger.LogLevel
 
 	Options map[string]string
 }
@@ -53,9 +54,7 @@ func NewDB(opts ...Option) *gorm.DB {
 	if err != nil {
 		panic(err)
 	}
-	if dsn.DebugMode {
-		db = db.Debug()
-	}
+	db.Logger = logger.Default.LogMode(dsn.LogLevel)
 	var ddb *sql.DB
 	ddb, err = db.DB()
 	if err != nil {
@@ -118,9 +117,19 @@ func MaxLifeTime(maxLifeTime time.Duration) Option {
 	}
 }
 
-func DebugMode(debugMode bool) Option {
+func LogLevel(level string) Option {
 	return func(d *Dsn) {
-		d.DebugMode = debugMode
+		var s = strings.ToLower(level)
+		switch s {
+		case "none":
+			d.LogLevel = logger.Silent
+		case "error":
+			d.LogLevel = logger.Error
+		case "info":
+			d.LogLevel = logger.Info
+		default:
+			d.LogLevel = logger.Warn
+		}
 	}
 }
 
@@ -153,7 +162,7 @@ func genDefaultDsn() *Dsn {
 		MaxOpenConn: 40,
 		MaxIdle:     20,
 		MaxLifeTime: time.Hour,
-		DebugMode:   false,
+		LogLevel:    logger.Warn,
 
 		Options: make(map[string]string),
 	}
@@ -171,7 +180,7 @@ var _ = Proto("tcp")
 var _ = MaxOpenConn(40)
 var _ = MaxIdle(20)
 var _ = MaxLifeTime(time.Hour)
-var _ = DebugMode(true)
+var _ = LogLevel("error")
 var _ = Charset("utf8mb4")
 var _ = ParseTime("True")
 var _ = Loc("Local")

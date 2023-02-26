@@ -52,10 +52,10 @@ func NewState() *StateM {
 
 func NewQRandState() *StateM {
 	var cards = GenQRandCards()
-	return NewGameState(cards)
+	return NewGameStateFromCards(cards)
 }
 
-func NewGameState(cards []Card) *StateM {
+func NewGameStateFromLegacyCards(cards []Card) *StateM {
 	var s = NewState()
 	for i := 0; i < DeckCount; i++ {
 		s.StockCardBits.AddCard(cards[i])
@@ -70,6 +70,25 @@ func NewGameState(cards []Card) *StateM {
 			} else {
 				s.PileTable[i].AddCard(cards[cursor])
 			}
+			cursor++
+		}
+	}
+	return s
+}
+
+func NewGameStateFromCards(cards []Card) *StateM {
+	var s = NewState()
+	for i := 0; i < DeckCount; i++ {
+		s.StockCardBits.AddCard(cards[i])
+	}
+	var cursor = DeckCount
+	for j := 0; j < PileCount; j++ {
+		for i := j; i < PileCount; i++ {
+			var c = cards[cursor]
+			if i != j {
+				c.SetFaceDown()
+			}
+			s.PileTable[i].AddCard(c)
 			cursor++
 		}
 	}
@@ -146,6 +165,15 @@ func (s *StateM) IsWin() bool {
 	return true
 }
 
+func (s *StateM) SamePiles(o *StateM) bool {
+	for i := 0; i < PileCount; i++ {
+		if !s.PileTable[i].Equals(&o.PileTable[i]) {
+			return false
+		}
+	}
+	return true
+}
+
 func (s *StateM) ReverseBroadcast() {
 	var p = s
 	// reverse broadcast
@@ -154,7 +182,9 @@ func (s *StateM) ReverseBroadcast() {
 		if pp == nil {
 			break
 		}
-		pp.ReverseStep = p.ReverseStep + 1
+		if pp.ReverseStep == 0 || pp.ReverseStep > p.ReverseStep+1 {
+			pp.ReverseStep = p.ReverseStep + 1
+		}
 		p = pp
 	}
 }

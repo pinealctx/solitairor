@@ -39,3 +39,12 @@ func (p *PileList) Clone() PileList {
 	}
 	return o
 }
+
+func (p *PileList) Equals(o *PileList) bool {
+	for i := range p {
+		if !p[i].Equals(&o[i]) {
+			return false
+		}
+	}
+	return true
+}

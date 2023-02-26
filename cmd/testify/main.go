@@ -32,6 +32,10 @@ func main() {
 				Usage: "run count",
 				Value: 1000,
 			},
+			&cli.BoolFlag{
+				Name:  "debug",
+				Usage: "debug solver",
+			},
 		},
 		Action: runCmd,
 	}
@@ -50,14 +54,19 @@ func runCmd(c *cli.Context) error {
 	var runCount = c.Int("runCount")
 	var validCount = 0
 
+	var debug = c.Bool("debug")
 	fmt.Println("start generate solitaire")
 	for i := 0; i < runCount; i++ {
 		if generateSolitaire() {
 			validCount++
 		}
-		fmt.Print(".")
+		if debug {
+			fmt.Print(".")
+		}
 	}
-	fmt.Println("")
+	if debug {
+		fmt.Println("")
+	}
 
 	var t2 = time.Now()
 	var dur = t2.Sub(t1)
@@ -70,10 +79,7 @@ func runCmd(c *cli.Context) error {
 func generateSolitaire() bool {
 	var cards = sol.GenQRandCards()
 	var p = sol.NewPuzzle(maxStackSize, maxSearchSize)
-	p.InitRoot(sol.NewGameState(cards))
+	p.InitRoot(sol.NewGameStateFromCards(cards))
 	p.Run()
-	if p.SolutionCount() > 0 {
-		return true
-	}
-	return false
+	return p.SolutionCount() > 0
 }

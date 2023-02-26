@@ -20,6 +20,8 @@ type Puzzle struct {
 	// record hit
 	// key is the step, value is counter.
 	hit map[int]int
+	// findFunc
+	findFunc func(*StateM) bool
 }
 
 func NewPuzzle(maxStackSize int, maxSearchSize int) *Puzzle {
@@ -29,6 +31,9 @@ func NewPuzzle(maxStackSize int, maxSearchSize int) *Puzzle {
 		maxStackSize:  maxStackSize,
 		maxSearchSize: maxSearchSize,
 		hit:           make(map[int]int),
+		findFunc: func(state *StateM) bool {
+			return state.IsWin()
+		},
 	}
 	return p
 }
@@ -119,7 +124,7 @@ func (p *Puzzle) push(childStates ...*StateM) EndProcReason {
 
 	var count EndProcReason
 	for _, child := range childStates {
-		if child.IsWin() {
+		if p.findFunc(child) {
 			// already win, record it
 			p.hit[child.ForwardStep]++
 			child.ReverseBroadcast()
