@@ -99,12 +99,13 @@ func handleRecordItem(item *sol.Record) {
 	}
 	var cls = sol.ConvertLegacyCards(ccs).ToBytes()
 	var cr = sol.CardRecord{
-		Step:  item.AverageStep,
-		Min:   item.MinStep,
-		Max:   item.MaxStep,
-		Diff:  item.DiffStep,
-		Road:  item.SolutionCount,
-		Cards: cls,
+		SearchCount: item.SearchCount,
+		Step:        item.AverageStep,
+		Min:         item.MinStep,
+		Max:         item.MaxStep,
+		Diff:        item.DiffStep,
+		Road:        item.SolutionCount,
+		Cards:       cls,
 	}
 	var buf []byte
 	buf, err = json.Marshal(cr)

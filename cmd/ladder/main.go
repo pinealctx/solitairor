@@ -87,27 +87,12 @@ func runCmd(c *cli.Context) error {
 		ccs[i] = sol.GenQRandCards()
 	}
 
-	//print init cards
-	for i := 0; i < Count; i++ {
-		printInitCards(ccs[i])
-	}
-
 	for i := range searchCountList {
-		fmt.Println("--------", searchCountList[i], "----------")
 		for j := 0; j < Count; j++ {
 			handleCards(ccs[j], searchCountList[i])
 		}
 	}
 	return nil
-}
-
-func printInitCards(cards sol.Cards) {
-	var cr = BCards{Cards: cards.ToBytes()}
-	var buf, err = json.Marshal(cr)
-	if err != nil {
-		return
-	}
-	fmt.Println(string(buf))
 }
 
 func handleCards(cards sol.Cards, maxSearchSize int) {
@@ -118,12 +103,13 @@ func handleCards(cards sol.Cards, maxSearchSize int) {
 		var r = &sol.Record{}
 		p.Record(r)
 		var cr = sol.CardRecord{
-			Step:  r.AverageStep,
-			Min:   r.MinStep,
-			Max:   r.MaxStep,
-			Diff:  r.DiffStep,
-			Road:  r.SolutionCount,
-			Cards: cards.ToBytes(),
+			SearchCount: maxSearchSize,
+			Step:        r.AverageStep,
+			Min:         r.MinStep,
+			Max:         r.MaxStep,
+			Diff:        r.DiffStep,
+			Road:        r.SolutionCount,
+			Cards:       cards.ToBytes(),
 		}
 		var buf, err = json.Marshal(cr)
 		if err != nil {

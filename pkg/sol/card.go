@@ -267,12 +267,13 @@ func MakeCardsFromBytes(buf []byte) Cards {
 }
 
 type CardRecord struct {
-	Step  int    `json:"step"`
-	Min   int    `json:"min"`
-	Max   int    `json:"max"`
-	Diff  int    `json:"diff"`
-	Road  int    `json:"road"`
-	Cards []byte `json:"cards"`
+	SearchCount int    `json:"searchCount"`
+	Step        int    `json:"step"`
+	Min         int    `json:"min"`
+	Max         int    `json:"max"`
+	Diff        int    `json:"diff"`
+	Road        int    `json:"road"`
+	Cards       []byte `json:"cards"`
 }
 
 func init() {
