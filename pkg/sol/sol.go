@@ -1,6 +1,8 @@
 package sol
 
-import "math"
+import (
+	"math"
+)
 
 type Puzzle struct {
 	stack    *Stack
@@ -22,6 +24,9 @@ type Puzzle struct {
 	hit map[int]int
 	// findFunc
 	findFunc func(*StateM) bool
+
+	// debugMode
+	debugMode bool
 }
 
 func NewPuzzle(maxStackSize int, maxSearchSize int) *Puzzle {
@@ -127,7 +132,11 @@ func (p *Puzzle) push(childStates ...*StateM) EndProcReason {
 		if p.findFunc(child) {
 			// already win, record it
 			p.hit[child.ForwardStep]++
-			child.ReverseBroadcast()
+			if p.debugMode {
+				child.ReverseBroadcastWithLog()
+			} else {
+				child.ReverseBroadcast()
+			}
 			// no need to push into stack
 			continue
 		}

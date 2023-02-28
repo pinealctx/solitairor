@@ -19,6 +19,38 @@ func TestPuzzle_RunRand(t *testing.T) {
 	tRunPuzzleAndLog(t, p, NewGameStateFromLegacyCards(cards), r)
 }
 
+func TestShunCardSolver(t *testing.T) {
+	var cs = GenCards()
+	var bs = cs.ToBytes()
+	testCardsSolverWithDebug(t, bs, 3012, true)
+}
+
+func TestPartSolver(t *testing.T) {
+	var st = NewState()
+	//deck:♠️9,♠️10,♠️J,♠️Q,♠️K,
+	st.StockCardBits.AddCard(SpadesCards[9-1],
+		SpadesCards[10-1], SpadesCards[JackRank-1], SpadesCards[QueenRank-1], SpadesCards[KingRank-1])
+	//pile1:
+	//pile2:♥️K*,♣️6,
+	st.PileTable[2-1].AddCard(HeartsCards[KingRank-1].FaceDownCard(), ClubsCards[6-1])
+	//pile3:♦️K,♣️Q,♦️J,
+	st.PileTable[3-1].AddCard(DiamondsCards[KingRank-1], ClubsCards[QueenRank-1], DiamondsCards[JackRank-1])
+	//pile4:♣️2*,♣️8*,♣️K*,♦️4,
+	st.PileTable[4-1].AddCard(ClubsCards[2-1].FaceDownCard(), ClubsCards[8-1].FaceDownCard(),
+		ClubsCards[KingRank-1].FaceDownCard(), DiamondsCards[4-1])
+	//pile5:♣️4*,♣️10*,♦️2*,♦️6*,♦️9,
+	st.PileTable[5-1].AddCard(ClubsCards[4-1].FaceDownCard(), ClubsCards[10-1].FaceDownCard(),
+		DiamondsCards[2-1].FaceDownCard(), DiamondsCards[6-1].FaceDownCard(), DiamondsCards[9-1])
+	//pile6:♣️3*,♣️9*,♦️A*,♦️5*,♦️8,♣️7,
+	st.PileTable[6-1].AddCard(ClubsCards[3-1].FaceDownCard(), ClubsCards[9-1].FaceDownCard(),
+		DiamondsCards[AceRank-1].FaceDownCard(), DiamondsCards[5-1].FaceDownCard(), DiamondsCards[8-1], ClubsCards[7-1])
+	//pile7:♣️5*,♣️J*,♦️3*,♦️7*,♦️10*,♦️Q,
+	st.PileTable[7-1].AddCard(ClubsCards[5-1].FaceDownCard(), ClubsCards[JackRank-1].FaceDownCard(),
+		DiamondsCards[3-1].FaceDownCard(), DiamondsCards[7-1].FaceDownCard(), DiamondsCards[10-1].FaceDownCard(),
+		DiamondsCards[QueenRank-1])
+	testSolver(t, 100000000, st, "", true)
+}
+
 func TestSimpleCardSolver(t *testing.T) {
 	var bs = []byte{122, 100, 87, 98, 89, 105, 92, 88, 106, 69, 82, 108, 91, 116, 104, 109, 125, 99, 97, 120, 114, 85, 113, 90, 39, 124, 68, 93, 71, 117, 84, 37, 65, 81, 119, 75, 118, 43, 121, 83, 66, 115, 3, 70, 74, 86, 12, 102, 72, 13, 73, 59}
 	testCardsSolver(t, bs, 10000000)
@@ -106,13 +138,22 @@ func TestMixCardSolver2(t *testing.T) {
 }
 
 func testCardsSolver(t *testing.T, bs []byte, maxSearchSize int) {
+	testCardsSolverWithDebug(t, bs, maxSearchSize, false)
+}
+
+func testCardsSolverWithDebug(t *testing.T, bs []byte, maxSearchSize int, debugMode bool) {
 	var cs = MakeCardsFromBytes(bs)
 	t.Log(cs)
 	var st = NewGameStateFromCards(cs)
+	testSolver(t, maxSearchSize, st, cs.Txt(), debugMode)
+}
+
+func testSolver(t *testing.T, maxSearchSize int, st *StateM, cardsTxt string, debugMode bool) {
 	var p = NewPuzzle(10000000, maxSearchSize)
+	p.debugMode = debugMode
 	p.InitRoot(st)
 	p.Run()
-	var r = &Record{InitCards: cs.Txt()}
+	var r = &Record{InitCards: cardsTxt}
 	p.Record(r)
 	t.Log(r)
 }

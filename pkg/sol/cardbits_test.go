@@ -21,3 +21,42 @@ func TestCardBits_Set(t *testing.T) {
 	t.Log(x.Has(SpadesCards[3]))
 	t.Log(x.Has(SpadesCards[1]))
 }
+
+func TestCardBits_AddCard(t *testing.T) {
+	var x CardBits
+	t.Log(x)
+	t.Log(x.Empty())
+	t.Log(x.Has(SpadesCards[0]))
+	t.Log(x.Has(HeartsCards[0]))
+
+	x.AddCard(SpadesCards[0])
+	t.Log(x)
+	t.Log(x.Empty())
+	t.Log(x.Has(SpadesCards[0]))
+	t.Log(x.Has(HeartsCards[0]))
+
+	x.RemoveCard(SpadesCards[0])
+	t.Log(x)
+	t.Log(x.Empty())
+	t.Log(x.Has(SpadesCards[0]))
+	t.Log(x.Has(HeartsCards[0]))
+
+	x.AddCard(SpadesCards[0], HeartsCards[0])
+	t.Log(x)
+	t.Log(x.Empty())
+	t.Log(x.Has(SpadesCards[0]))
+	t.Log(x.Has(HeartsCards[0]))
+
+	x.RemoveCard(SpadesCards[0], HeartsCards[0])
+	t.Log(x)
+	t.Log(x.Empty())
+	t.Log(x.Has(SpadesCards[0]))
+	t.Log(x.Has(HeartsCards[0]))
+
+	x.AddCard(SpadesCards[0], HeartsCards[0])
+	x.RemoveCard(HeartsCards[0])
+	t.Log(x)
+	t.Log(x.Empty())
+	t.Log(x.Has(SpadesCards[0]))
+	t.Log(x.Has(HeartsCards[0]))
+}

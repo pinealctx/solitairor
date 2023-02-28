@@ -1,6 +1,7 @@
 package sol
 
 import (
+	"fmt"
 	"testing"
 )
 
@@ -183,4 +184,30 @@ func TestCards_Txt(t *testing.T) {
 	var r = GenQRandCards()
 	t.Log(r.Txt())
 	t.Log(r.JTxt())
+}
+
+func TestCard_Seq(t *testing.T) {
+	for i := 0; i < CardCountOfColor; i++ {
+		var x = SpadesCards[i]
+		fmt.Print(x.Seq(), ",")
+	}
+	fmt.Println("")
+
+	for i := 0; i < CardCountOfColor; i++ {
+		var x = HeartsCards[i]
+		fmt.Print(x.Seq(), ",")
+	}
+	fmt.Println("")
+
+	for i := 0; i < CardCountOfColor; i++ {
+		var x = ClubsCards[i]
+		fmt.Print(x.Seq(), ",")
+	}
+	fmt.Println("")
+
+	for i := 0; i < CardCountOfColor; i++ {
+		var x = DiamondsCards[i]
+		fmt.Print(x.Seq(), ",")
+	}
+	fmt.Println("")
 }

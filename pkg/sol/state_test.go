@@ -1,6 +1,9 @@
 package sol
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+)
 
 type VisitRec map[StateKey]struct{}
 
@@ -97,6 +100,26 @@ func TestNewQRandState(t *testing.T) {
 	var s = NewQRandState()
 	for i := 0; i < PileCount; i++ {
 		t.Log(s.PileTable[i].Cards)
+	}
+}
+
+func TestNewGameStateFromCards(t *testing.T) {
+	var cards = GenCards()
+	var s = NewGameStateFromCards(cards)
+	fmt.Println("deck:")
+	for _, c := range cards {
+		if s.StockCardBits.Has(c) {
+			fmt.Print(c, ",")
+		}
+	}
+	fmt.Println("")
+
+	for i := 0; i < PileCount; i++ {
+		fmt.Println("tile", i+1, ":")
+		for _, c := range s.PileTable[i].Cards {
+			fmt.Print(c, ",")
+		}
+		fmt.Println("")
 	}
 }
 

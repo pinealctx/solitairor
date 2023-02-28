@@ -1,5 +1,10 @@
 package sol
 
+import (
+	"bytes"
+	"fmt"
+)
+
 const (
 	DeckCount = 24
 )
@@ -187,4 +192,54 @@ func (s *StateM) ReverseBroadcast() {
 		}
 		p = pp
 	}
+}
+
+func (s *StateM) ReverseBroadcastWithLog() {
+	var p = s
+	fmt.Println(p)
+	// reverse broadcast
+	for {
+		var pp = p.Parent
+		if pp == nil {
+			break
+		}
+		fmt.Println(pp)
+		if pp.ReverseStep == 0 || pp.ReverseStep > p.ReverseStep+1 {
+			pp.ReverseStep = p.ReverseStep + 1
+		}
+		p = pp
+	}
+}
+
+func (s *StateM) String() string {
+	var buf = bytes.NewBuffer(make([]byte, 4096))
+	buf.Reset()
+
+	buf.WriteString("foundations:")
+	buf.WriteString(fmt.Sprintf("spades:%d", s.SpadesFound))
+	buf.WriteString(fmt.Sprintf(",hearts:%d", s.HeartsFound))
+	buf.WriteString(fmt.Sprintf(",clubs:%d", s.ClubsFound))
+	buf.WriteString(fmt.Sprintf(",diamonds:%d", s.DiamondsFound))
+	buf.WriteByte('\n')
+
+	buf.WriteString("deck:")
+	var cs = GenCards()
+	for _, c := range cs {
+		if s.StockCardBits.Has(c) {
+			buf.WriteString(c.String())
+			buf.WriteByte(',')
+		}
+	}
+	buf.WriteByte('\n')
+
+	for i := 0; i < PileCount; i++ {
+		buf.WriteString(fmt.Sprintf("pile%d:", i+1))
+		var p = &s.PileTable[i]
+		for j := 0; j < p.Len(); j++ {
+			buf.WriteString(p.Cards[j].String())
+			buf.WriteByte(',')
+		}
+		buf.WriteByte('\n')
+	}
+	return buf.String()
 }

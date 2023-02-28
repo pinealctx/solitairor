@@ -151,6 +151,10 @@ func (x Card) String() string {
 	return x.Suit().String() + x.Rank().String()
 }
 
+func (x Card) FaceDownCard() Card {
+	return x | 0b01000000
+}
+
 func (x *Card) SetFaceDown() {
 	*x |= 0b01000000
 }
