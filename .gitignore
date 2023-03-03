@@ -1,2 +1,5 @@
 .idea
 bin
+.DS_Store
+pkg/msc/main
+pkg/msc/*_test.go
